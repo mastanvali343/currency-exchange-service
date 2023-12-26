@@ -14,11 +14,20 @@ public class CircuitBreakerController {
 	
 	private Logger logger = LoggerFactory.getLogger(CircuitBreakerController.class);
 	
+	@Retry(name = "sample-api", fallbackMethod = "fallbackMethod")
+//	@Retry(name = "sample-api")
+//	@Retry(name = "")
 	@GetMapping("sample-api")
-	@Retry(name = "default")
 	public String sampleApi() {
 		logger.info("======Inside sampleApi========");
 		ResponseEntity<String> response = new RestTemplate().getForEntity("http://localhost:8200/dummy-url", String.class);
 		return response.getBody();
+	}
+	
+	public String fallbackMethod(Exception e) {
+		System.getenv().entrySet().stream().forEach(entry-> System.out.println(entry.getKey()+" ====> "+entry.getValue()));
+		System.out.println("================================================");
+		System.getProperties().entrySet().forEach(entry-> System.out.println(entry.getKey()+" ====> "+entry.getValue()));
+		return "fall back method...";
 	}
 }
